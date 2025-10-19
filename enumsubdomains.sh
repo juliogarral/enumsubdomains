@@ -2,8 +2,14 @@
 set -euo pipefail
 
 # enum_subdomains.sh
+# Usage: ./enum_subdomains.sh domain.tld
+# Outputs:
+#   subdomains.txt        → All unique subdomains
+#   alive_subdomains.txt  → Subdomains responding via HTTP/HTTPS
 
-# --- Banner ASCII ---
+# ──────────────────────────────
+#  ASCII BANNER
+# ──────────────────────────────
 cat <<'EOF'
                                         ___.        .___                           .__               
   ____   ____  __ __  _____   ________ _\_ |__    __| _/____   _____   ____ _____  |__| ____   ______
@@ -110,7 +116,8 @@ fi
 
 if command -v httpx >/dev/null 2>&1; then
   echo "[*] Checking live hosts with httpx..."
-  cat "$OUTFILE" | httpx -silent -o "$ALIVE_OUT" 2>/dev/null
+  # Completely silent httpx execution — only saves results to file
+  cat "$OUTFILE" | httpx -silent -o "$ALIVE_OUT" > /dev/null 2>&1
   echo "[+] Live hosts saved to: $ALIVE_OUT"
 else
   echo "[*] httpx not found, using curl fallback..."
@@ -126,7 +133,7 @@ else
   echo "[+] Live hosts saved to: $ALIVE_OUT"
 fi
 
-# --- No "Enumeration complete" message if interrupted ---
+# --- Avoid "Enumeration complete" if interrupted ---
 if [[ $? -eq 130 ]]; then
   exit 130
 fi
